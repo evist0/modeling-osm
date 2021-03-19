@@ -9,6 +9,8 @@ namespace DeadInside
         public float FirstDowntimeProbability { get; set; }
         public float SecondDowntimeProbability { get; set; }
         public float AverageTimeInQueue { get; set; }
+
+        public float AverageTimeInSystem { get; set; }
     }
 
     internal class Simulation
@@ -29,6 +31,8 @@ namespace DeadInside
         private int _secondSolverDowntime;
 
         private float _queueTime;
+
+        private float _inSystemTime;
 
         public Simulation(Random random)
         {
@@ -54,7 +58,8 @@ namespace DeadInside
             {
                 AverageTimeInQueue = _queueTime / _solvedTaskAmount,
                 FirstDowntimeProbability = (float) _firstSolverDowntime / _time,
-                SecondDowntimeProbability = (float) _secondSolverDowntime / _time
+                SecondDowntimeProbability = (float) _secondSolverDowntime / _time,
+                AverageTimeInSystem = _inSystemTime / _solvedTaskAmount
             };
 
 
@@ -153,6 +158,7 @@ namespace DeadInside
             _firstSolver = new Task(dequeued.Id, _time + dequeued.TimeToSolve, dequeued.TimeStamp);
 
             _queueTime += _time - dequeued.TimeStamp;
+            _inSystemTime += _time - dequeued.TimeStamp + dequeued.TimeToSolve;
         }
 
         private void SolveOnSecond()
@@ -162,6 +168,7 @@ namespace DeadInside
             _secondSolver = new Task(dequeued.Id, _time + dequeued.TimeToSolve, dequeued.TimeStamp);
 
             _queueTime += _time - dequeued.TimeStamp;
+            _inSystemTime += _time - dequeued.TimeStamp + dequeued.TimeToSolve;
         }
     }
 }
